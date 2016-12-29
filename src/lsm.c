@@ -65,14 +65,22 @@ static int lsm_inode_unlink(struct inode *dir, struct dentry *dentry){
 	return flag;
 }
 
+
 static int lsm_inode_create(struct inode *dir, struct dentry *dentry, int mode){
 	int flagid = 1;
 	int flag = 0;
 	flag = get_flag(current->pid,flagid);
-	if( flag == 1)
+	if( flag == 1){
+		printk("Flag: %i \n",flag);
 		printk("Create Failed ! Permission Denied.\n");
+	}
+	else{
+		printk("Flag: %i \n",flag);
+		printk("Create Success !.\n");	
+	}
 	return flag;
 }
+
 
 static int lsm_inode_mkdir(struct inode *dir, struct dentry *dentry, int mode){
 	int flagid = 1;
@@ -82,7 +90,6 @@ static int lsm_inode_mkdir(struct inode *dir, struct dentry *dentry, int mode){
 		printk("Create Failed ! Permission Denied.\n");
 	return flag;
 }
-
 
 
 int write_controlleddir(int fd, char *buf, ssize_t len){

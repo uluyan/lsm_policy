@@ -48,9 +48,7 @@ def writefile():
 def createfile():
     print "------ Start Create File ------"
     try:
-    	f = open("create")
-    	print "---- Create OK ----"
-    	f.close()
+        os.mkdir('test')
     except:
     	print "---- Create New File Failed ----"
     resp = make_response(json.dumps({'rtn':0,'message':'OK'}))
@@ -63,7 +61,10 @@ def deletefile():
     filename = 'delete'
     if os.path.exists(filename) :
     	os.remove(filename)
-    	print '---- Delete OK'
+    if os.path.exists(filename) :
+        resp = make_response(json.dumps({'rtn':-1,'message':'Faild'}))
+        resp.headers = {'Conten-Type':'application/json','charset':'UTF-8'}
+        return resp
     resp = make_response(json.dumps({'rtn':0,'message':'OK'}))
     resp.headers = {'Conten-Type':'application/json','charset':'UTF-8'}
     return resp
