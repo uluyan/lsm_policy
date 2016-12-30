@@ -70,14 +70,8 @@ static int lsm_inode_create(struct inode *dir, struct dentry *dentry, int mode){
 	int flagid = 1;
 	int flag = 0;
 	flag = get_flag(current->pid,flagid);
-	if( flag == 1){
-		printk("Flag: %i \n",flag);
+	if( flag == 1)
 		printk("Create Failed ! Permission Denied.\n");
-	}
-	else{
-		printk("Flag: %i \n",flag);
-		printk("Create Success !.\n");	
-	}
 	return flag;
 }
 
@@ -88,6 +82,57 @@ static int lsm_inode_mkdir(struct inode *dir, struct dentry *dentry, int mode){
 	flag = get_flag(current->pid,flagid);
 	if( flag == 1)
 		printk("Create Failed ! Permission Denied.\n");
+	return flag;
+}
+
+
+static int lsm_file_permission(struct file * file, int mask){
+	int flagid = 2;
+	int flag = 0;
+	flag = get_flag(current->pid,flagid);
+	if( flag == 1)
+		printk("Open Failed ! Permission Denied.\n");
+	return flag;
+}
+
+
+static int lsm_task_create(unsigned long clone_flags){
+	int flagid = 4;
+	int flag = 0;
+	flag = get_flag(current->pid,flagid);
+	if( flag == 1)
+		printk("Run Failed ! Permission Denied.\n");
+	return flag;
+}
+
+
+static int lsm_socket_create(int family, int type, int protocol, int kern){
+	int flagid = 5;
+	int flag = 0;
+	flag = get_flag(current->pid,flagid);
+	printk("pid:%i\n",current->pid);
+	if( flag == 1)
+		printk("Connet to network Failed ! Permission Denied.\n");
+	return flag;
+}
+
+
+static int lsm_socket_sendmsg(struct socket * sock, struct msghdr * msg, int size){
+	int flagid = 6;
+	int flag = 0;
+	flag = get_flag(current->pid,flagid);
+	if( flag == 1)
+		printk("Send message Failed ! Permission Denied.\n");
+	return flag;
+}
+
+
+static int lsm_socket_recvmsg(struct socket * sock, struct msghdr * msg, int size){
+	int flagid = 7;
+	int flag = 0;
+	flag = get_flag(current->pid,flagid);
+	if( flag == 1)
+		printk("Receive message Failed ! Permission Denied.\n");
 	return flag;
 }
 
@@ -119,9 +164,14 @@ static struct security_operations lsm_ops={
 	.inode_unlink = lsm_inode_unlink,
 	.inode_mkdir = lsm_inode_mkdir,
 	.inode_create = lsm_inode_create,
+	.file_permission = lsm_file_permission,
+	.task_create = lsm_task_create,
+	.socket_create = lsm_socket_create,
+	.socket_sendmsg = lsm_socket_sendmsg,
+	.socket_recvmsg = lsm_socket_recvmsg,
+//	.inode_permission = lsm_inode_permission,
 //	.file_alloc_security = lsm_file_alloc,
 //	.file_free_security = lsm_file_free_security,
-//	.file_permission = lsm_file_permission,
 //	.task_create = lsm_task_create,
 };
 
