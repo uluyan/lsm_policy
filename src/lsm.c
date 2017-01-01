@@ -16,7 +16,6 @@ char get_flag(int current_pid, int flagid){
     char current_id[256];
     char flags[256];
     char pid[256];
-    int fd;
 
     sprintf(pid,"%i",current_pid);
 
@@ -87,21 +86,44 @@ static int lsm_inode_mkdir(struct inode *dir, struct dentry *dentry, int mode){
 
 
 static int lsm_file_permission(struct file * file, int mask){
-	int flagid = 2;
-	int flag = 0;
-	flag = get_flag(current->pid,flagid);
-	if( flag == 1)
-		printk("Open Failed ! Permission Denied.\n");
-	return flag;
+	int flag1 = 0;
+	int flag2 = 0;
+	flag1 = get_flag(current->pid,2);
+	flag2 = get_flag(current->pid,3);
+	if( flag1 == 1){
+		printk("Read Failed ! Permission Denied.\n");
+	    return 1;		
+	}
+	else{
+		if( flag2 == 1){
+		printk("Write Failed ! Permission Denied.\n");
+	    return 1;	
+		}
+	}
+	return 0;
 }
 
 
-static int lsm_task_create(unsigned long clone_flags){
+static int lsm_sb_mount(char *dev_name, struct nameidata * nd, char *type, unsigned long flags, void *data){
 	int flagid = 4;
 	int flag = 0;
 	flag = get_flag(current->pid,flagid);
 	if( flag == 1)
-		printk("Run Failed ! Permission Denied.\n");
+		printk("Mount Failed ! Permission Denied.\n");
+	else
+		printk("Mount Failed ! Permission Denied.\n");		
+	return flag;
+}
+
+
+static int lsm_sb_umount(struct vfsmount * mnt, int flags){
+	int flagid = 5;
+	int flag = 0;
+	flag = get_flag(current->pid,flagid);
+	if( flag == 1)
+		printk("Umount Failed ! Permission Denied.\n");
+	else
+		printk("Umount Failed ! Permission Denied.\n");		
 	return flag;
 }
 
@@ -110,7 +132,6 @@ static int lsm_socket_create(int family, int type, int protocol, int kern){
 	int flagid = 5;
 	int flag = 0;
 	flag = get_flag(current->pid,flagid);
-	printk("pid:%i\n",current->pid);
 	if( flag == 1)
 		printk("Connet to network Failed ! Permission Denied.\n");
 	return flag;
@@ -127,7 +148,7 @@ static int lsm_socket_sendmsg(struct socket * sock, struct msghdr * msg, int siz
 }
 
 
-static int lsm_socket_recvmsg(struct socket * sock, struct msghdr * msg, int size){
+static int lsm_socket_recvmsg(struct socket * sock, struct msghdr * msg, int size, int flags){
 	int flagid = 7;
 	int flag = 0;
 	flag = get_flag(current->pid,flagid);
@@ -137,7 +158,8 @@ static int lsm_socket_recvmsg(struct socket * sock, struct msghdr * msg, int siz
 }
 
 
-int write_controlleddir(int fd, char *buf, ssize_t len){
+int write_controlleddir(int fd, char *buf, ssize_t len)
+{
 	if (len == 0){
 		enable_flag = 0;
 		printk("Cancel the protect mechanism sucessfullly! \n");
@@ -165,8 +187,10 @@ static struct security_operations lsm_ops={
 	.inode_mkdir = lsm_inode_mkdir,
 	.inode_create = lsm_inode_create,
 	.file_permission = lsm_file_permission,
-	.task_create = lsm_task_create,
-	.socket_create = lsm_socket_create,
+//	.task_create = lsm_task_create,
+//	.socket_create = lsm_socket_create,
+	.sb_mount = lsm_sb_mount,
+	.sb_umount = lsm_sb_umount,
 	.socket_sendmsg = lsm_socket_sendmsg,
 	.socket_recvmsg = lsm_socket_recvmsg,
 //	.inode_permission = lsm_inode_permission,

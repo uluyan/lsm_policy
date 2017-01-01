@@ -51,11 +51,13 @@ def writefile():
 @app.route('/file/create',methods=['GET'])
 def createfile():
     print "------ Start Create File ------"
-    body = {'rtn':0,'message':'OK'}
+    body = {'rtn':-1,'message':'Error'}
     try:
         os.mkdir('test')
     except:
     	body = {'rtn':-1,'message':'Error'}
+    if os.path.exists('test') :
+        body = {'rtn':0,'message':'OK'}
     resp = make_response(json.dumps(body))
     resp.headers = {'Conten-Type':'application/json','charset':'UTF-8'}
     return resp
@@ -78,7 +80,7 @@ def runfile():
     print "------ Start Run File ------"
     body = {'rtn':0,'message':'OK'}
     try:
-        with os.system('./run')
+        os.system('./run')
     except:
         body = {'rtn':-1,'message':'Error'}
     resp = make_response(json.dumps(body))

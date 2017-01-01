@@ -1,7 +1,7 @@
 import os
 
 def init():
-    Files = ['read','write','create','delete']
+    Files = ['read','write','delete']
     for f in Files:
         if os.path.exists(f):
             os.remove(f)
@@ -10,6 +10,8 @@ def init():
     newf2 = open('read','w')
     newf2.writelines('Hello!')
     newf2.close()
+    if os.path.exists('create') :
+        os.remove('create')
 
 if __name__ == '__main__':
     init()
